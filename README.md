@@ -145,6 +145,9 @@ npm run preview
 4) Put it in backend/.env and restart the API:
    N8N_WEBHOOK_URL=http://localhost:5678/webhook/ai/feedback-enrich
 
+<img width="1332" height="736" alt="image" src="https://github.com/user-attachments/assets/27bdf901-2526-4843-94a8-fb5f68428137" />
+
+
 Start n8n locally:
 npx --yes n8n
 
