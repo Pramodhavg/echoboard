@@ -75,7 +75,7 @@ CORS_ORIGINS=http://localhost:5173
 # leave empty to disable enrichment
 N8N_WEBHOOK_URL=
 
-Frontend (React/Vite):
+### 2) Frontend (React/Vite):
 cd frontend
 npm install
 
@@ -99,38 +99,38 @@ curl -X POST http://127.0.0.1:8000/api/feedback \
 List feedback:
 curl http://127.0.0.1:8000/api/feedback
 
-Notes and Decisions
+### 3) Notes and Decisions
 --> Storage is a local SQLite file (backend/feedback.db), created automatically.
 --> The UI shows badges for positive, mixed, and negative. Neutral is intentionally hidden.
 --> Summary label reads “Summary:” to avoid implying an external AI requirement.
 --> The app works fully offline without any enrichment webhook configured.
 
-Troubleshooting
+### 4) Troubleshooting
 Port in use:
 --> Backend: change --port for uvicorn or stop the conflicting process.
 --> Frontend: npm run dev -- --port 5174 and update VITE_API_URL if needed.
 --> CORS: ensure CORS_ORIGINS in backend/.env matches your Vite URL.
 --> Reset DB: stop the backend, delete backend/feedback.db, restart the API.
 
-Scripts Reference
+### 5) Scripts Reference
 Backend:
 # from backend/
 uvicorn app:app --reload --port 8000
 
-Frontend:
+### 6) Frontend:
 # from frontend/
 npm run dev
 npm run build
 npm run preview
 
-What’s Implemented:
+### 7) What’s Implemented:
 --> Submit feedback (name + message) and list all feedback.
 --> Persistence via SQLite.
 --> Clean UI with filtering by sentiment and a text search.
 --> Environment-driven configuration for both frontend and backend.
 
 
-Optional: enable enrichment with n8n
+### 8) Optional: enable enrichment with n8n
 
 1) Start n8n locally:
    npx --yes n8n
