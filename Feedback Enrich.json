@@ -1,0 +1,144 @@
+{
+  "name": "Feedback Enrich",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ai/feedback-enrich",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f54cee94-b61e-4ba8-b7f7-7f13e0aae123",
+      "name": "Webhook",
+      "webhookId": "b898820c-0849-4f19-ab23-5c79097dc0a5"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{$json}}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        832,
+        0
+      ],
+      "id": "cef20672-186f-48db-b825-f246823e7489",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Name: {{$json.body.name}}\nMessage: {{$json.body.message}}\n\nYou are a concise CX analyst. Output STRICT JSON only:\n\n{\n  \"sentiment\": \"positive|neutral|negative|mixed\",\n  \"summary\": \"<=15 words\"\n}\n\nRules:\n- Use \"mixed\" if the same message has both positive and negative signals.\n- No prose, no code fences, no extra keys.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2.2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "3192625f-3bcb-400d-9d8b-d73606b9e17c",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        80,
+        208
+      ],
+      "id": "86aa218a-e4bc-47f8-830d-c0ca97585372",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "r7CFvXuS1Om6vVFL",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $json.text ?? $json.response ?? $json.content ?? $json.data ?? $json.output ?? $json;\nif (typeof raw !== 'string') raw = JSON.stringify(raw);\n\n// strip ```json ... ```\nlet s = raw.trim().replace(/^```(?:json)?/i, '').replace(/```$/i, '').trim();\n\n// parse JSON; fallback to first {...}\nlet obj = null;\ntry { obj = JSON.parse(s); } catch {\n  const m = s.match(/\\{[\\s\\S]*\\}/);\n  if (m) { try { obj = JSON.parse(m[0]); } catch {} }\n}\nif (!obj || typeof obj !== 'object') obj = {};\n\nlet sentiment = (obj.sentiment || '').toLowerCase().trim();\nlet summary   = (obj.summary || '').toString().trim();\n\nconst allowed = new Set(['positive','neutral','negative','mixed']);\nif (!allowed.has(sentiment)) sentiment = 'neutral';\n\nreturn [{ sentiment, summary }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "03f9e614-7b54-45c2-95c2-5d22ef7ad58a",
+      "name": "Normalize JSON"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Normalize JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize JSON": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "17c9adf9-b1e6-4bbe-9593-6665fef889bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f3e49cc4af95d6d68ea57f728c1f14b8ec791faab89fd1d11def482983a64c5c"
+  },
+  "id": "cuLTx2KV2dcITTZo",
+  "tags": []
+}
