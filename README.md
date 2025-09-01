@@ -128,3 +128,19 @@ What’s Implemented:
 --> Persistence via SQLite.
 --> Clean UI with filtering by sentiment and a text search.
 --> Environment-driven configuration for both frontend and backend.
+
+
+Optional: enable enrichment with n8n
+
+1) Start n8n locally:
+   npx --yes n8n
+   (Editor opens at http://localhost:5678)
+
+2) Import the workflow:
+   - Click “Import” in the editor, select n8n/feedback-enrich.json, then “Activate”.
+
+3) Copy the Production Webhook URL from the Webhook node
+   (looks like http://localhost:5678/webhook/ai/feedback-enrich).
+
+4) Put it in backend/.env and restart the API:
+   N8N_WEBHOOK_URL=http://localhost:5678/webhook/ai/feedback-enrich
