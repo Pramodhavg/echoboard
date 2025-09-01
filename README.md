@@ -144,3 +144,9 @@ Optional: enable enrichment with n8n
 
 4) Put it in backend/.env and restart the API:
    N8N_WEBHOOK_URL=http://localhost:5678/webhook/ai/feedback-enrich
+
+Start n8n locally:
+npx --yes n8n
+
+Update the n8n webhook:
+N8N_WEBHOOK_URL=http://127.0.0.1:5678/webhook/your-production-webhook-id
